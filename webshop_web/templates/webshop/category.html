@@ -1,0 +1,48 @@
+{% extends "webshop/base.html" %}
+
+{% block title %} {{ category_title }} {% endblock %}
+
+{% block count_in_cart %} {{ count }} {% endblock %}
+
+{% block sum_in_cart %} {{ sum }} {% endblock %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li class="active">{{ category_title }}</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+    <div class="items-row-flex">
+        {% for product in products %}
+            <a class="item-view col-lg-2" href="{% url 'about_product' product.id_product %}">
+                <div  align="center">
+                    <img class="item-view-image" src="{{ product.gallery.cover_image.path }}" alt="{{ product.title }}">
+                    <p class="item-view-title">{{ product.title }}</p>
+                    <p class="item-view-price">{{ product.price }}</p>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block pagination %}
+    <div align="center">
+        <ul class="pagination">
+            <li>
+                <a href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li><a href="#">1</a></li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li>
+                <a href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+{% endblock %}

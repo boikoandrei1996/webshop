@@ -1,0 +1,52 @@
+.product {
+
+}
+
+.product-title {
+    font-size: 20pt;
+    color: #2b669a;
+}
+
+.product-category {
+    font-size: 16pt;
+    color: #2b669a;
+}
+
+.product-main-body {
+
+}
+
+.product-images {
+
+}
+
+.product-images img {
+    max-width: 90%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    max-height: 150px;
+}
+
+.product-additional-inform {
+
+}
+
+.product-desc {
+    font-size: 12pt;
+    color: #2b669a;
+}
+
+.product-recall {
+
+}
+
+.product-recall-author {
+    font-size: 16pt;
+    color: #222288;
+}
+
+.product-recall-text {
+    font-size: 12pt;
+    color: #222288;
+}

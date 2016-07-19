@@ -1,0 +1,51 @@
+{% extends "webshop/base.html" %}
+
+{% block title %} {{ product.title }} {% endblock %}
+
+{% block count_in_cart %} {{ count }} {% endblock %}
+
+{% block sum_in_cart %} {{ sum }} {% endblock %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li><a href="{% url 'about_category' category_id %}">{{ category_title }}</a></li>
+        <li class="active">{{ product.title }}</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+    <div class="product">
+        <div class="product-title">{{ product.title }}</div>
+        <div class="product-category">{{ category_title }}</div>
+        <div class="product-main-body row">
+            <div class="product-images col-lg-6">
+                {% for image in images %}
+                    <img src="{{ image }}" alt="{{ product.title }}">
+                {% endfor %}
+            </div>
+            <div class="product-additional-inform col-lg-6">
+                <p>{{ product.id_product }}</p>
+                <p>{{ product.price }}</p>
+                <p>{{ product.rating }}</p>
+                <form action="{% url 'add_product' product.id_product %}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" class="btn btn-md btn-success" value="Купить">
+                </form>
+            </div>
+        </div>
+        <div class="product-desc">
+            <p>
+                {{ product.desc }}
+            </p>
+        </div>
+        {% for recall in recalls %}
+            <div class="product-recall">
+                <p class="product-recall-author">{{ recall.author }}</p>
+                <p class="product-recall-text">{{ recall.text }}</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block pagination %}{% endblock %}

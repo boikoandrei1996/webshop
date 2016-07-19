@@ -1,0 +1,62 @@
+{% extends "webshop/base.html" %}
+
+{% block title %} Оформление заказа {% endblock %}
+
+{% block count_in_cart %} {{ count }} {% endblock %}
+
+{% block sum_in_cart %} {{ sum }} {% endblock %}
+
+{% block breadcrumb %}
+{% endblock %}
+
+{% block content %}
+
+
+    {% for pair in cart_product_pairs %}
+        <form method="post" action="{% url 'delete_product' pair.product.id_product %}" class="form-inline">
+            {% csrf_token %}
+            <div class="form-group col-lg-6">
+                <label for="prod_title">Title:</label>
+                <input type="text" class="form-control input-sm" id="prod_title"
+                       name="product_title_{{ pair.product.id_product }}"
+                       value="{{ pair.product.title }}">
+            </div>
+
+            <div class="form-group col-lg-3">
+                <label for="prod_price">Price per one:</label>
+                <input type="text" class="form-control input-sm" id="prod_price"
+                       name="product_price_{{ pair.product.id_product }}"
+                       value="{{ pair.price }}" size="12">
+            </div>
+
+            <div class="form-group col-lg-2">
+                <label for="prod_amount">Amount:</label>
+                <input type="text" class="form-control input-sm" id="prod_amount"
+                       name="product_amount_{{ pair.product.id_product }}"
+                       value="{{ pair.amount }}" maxlength="2" size="2">
+            </div>
+
+            <button type="submit" class="btn btn-success btn-sm col-lg-1">
+                <span class="glyphicon glyphicon-trash"></span>Delete
+            </button>
+        </form>
+    {% endfor %}
+
+    <div>
+        <p>{{ cart.total_amount }}</p>
+        <p>{{ cart.total_price }}</p>
+    </div>
+
+    <form action="{% url 'package_order' cart.id %}" method="post">
+        {% csrf_token %}
+        <input type="text" name="name" value="" placeholder="your name">
+        <input type="text" name="city" value="" placeholder="your city">
+        <input type="text" name="address" value="" placeholder="your address">
+        <input type="text" name="mobile" value="" placeholder="your mobile">
+        <input type="text" name="comment" value="" placeholder="you can tell us more information">
+        <input type="submit" class="btn btn-md btn-success" value="Заказать">
+    </form>
+
+{% endblock %}
+
+{% block pagination %}{% endblock %}

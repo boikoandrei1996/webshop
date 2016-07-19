@@ -1,0 +1,85 @@
+{% extends "webshop/base.html" %}
+
+{% block title %} Интернет-магазин Case.by {% endblock %}
+
+{% block count_in_cart %} {{ count }} {% endblock %}
+
+{% block sum_in_cart %} {{ sum }} {% endblock %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li class="active">Home</li>
+    </ol>
+{% endblock %}
+
+{% block slider %}
+    <div id="myCarousel" class="carousel slide" style="height: 300px;">
+        <ol class="carousel-indicators">
+            {% for prod, images in slide_items %}
+                {% if forloop.counter == slide_active %}
+                    <li data-target="#myCarousel" data-slide-to="{{ forloop.counter0 }}" class="active"></li>
+                {% else %}
+                    <li data-target="#myCarousel" data-slide-to="{{ forloop.counter0 }}"></li>
+                {% endif %}
+            {% endfor %}
+        </ol>
+
+        <div class="carousel-inner" style="height: 100%">
+            {% for prod, images in slide_items %}
+                {% if forloop.counter == slide_active %}
+                    <div class="item item-slide active">
+                        <div align="center">
+                            {% for image in images %}
+                                <img src="{{ image }}" class="item-slide-img">
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="carousel-caption">
+                            <a href="{% url 'about_product' prod.id_product %}">
+                                <h2>Caption {{ forloop.counter }}</h2>
+                                <h4>{{ prod.title }}</h4>
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="item item-slide">
+                        <div align="center">
+                            {% for image in images %}
+                                <img src="{{ image }}" class="item-slide-img">
+                            {% endfor %}
+                        </div>
+
+                        <div class="carousel-caption">
+                            <a href="{% url 'about_product' prod.id_product %}">
+                                <h2>Caption {{ forloop.counter }}</h2>
+                                <h4>{{ prod.title }}</h4>
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+            <span class="icon-prev"></span>
+        </a>
+        <a class="right carousel-control" href="#myCarousel" data-slide="next">
+            <span class="icon-next"></span>
+        </a>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="items-row-flex">
+        {% for category in categories %}
+            <a class="item-view col-lg-2" href="{% url 'about_category' category.id %}">
+                <div align="center">
+                    <img class="item-view-image" src="{{ category.gallery.cover_image.path }}" alt="{{ category.title }}">
+                    <p class="item-view-title">{{ category.title }}</p>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block pagination %}{% endblock %}
