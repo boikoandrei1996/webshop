@@ -1,34 +1,30 @@
 from django import forms
 
 
-class SearchForm(forms.Form):
-    search_text = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Search',
-                                                                'class': 'form-control input-sm'}))
-
-
-class DeleteProductForm(forms.Form):
-    title = forms.CharField(label='Title', max_length=100)
-    price = forms.FloatField(label='Price per one')
-    amount = forms.IntegerField(label='Amount')
-
-
 class ClientForm(forms.Form):
-    name = forms.CharField(label='Your name',
+    required_css_class = 'required-field'
+
+    name = forms.CharField(label='', strip=True,
                            widget=forms.TextInput(attrs={'placeholder': 'Name',
+                                                         'size': '30',
                                                          'class': ''})
                            )
-    city = forms.CharField(label='Your city',
+    city = forms.CharField(label='', strip=True,
                            widget=forms.TextInput(attrs={'placeholder': 'City',
+                                                         'size': '30',
                                                          'class': ''})
                            )
-    address = forms.CharField(label='Your address',
+    address = forms.CharField(label='', strip=True,
                               widget=forms.TextInput(attrs={'placeholder': 'address',
+                                                            'size': '30',
                                                             'class': ''})
                               )
-    mobile = forms.CharField(label='Your mobile',
+    mobile = forms.CharField(label='', strip=True,
                              widget=forms.TextInput(attrs={'placeholder': 'mobile',
+                                                           'size': '30',
                                                            'class': ''})
                              )
-    comment = forms.CharField(label='Some comment for us', required=False,
+    comment = forms.CharField(label='', required=False, strip=True,
                               widget=forms.Textarea(attrs={'placeholder': 'You can tell us more information',
+                                                           'cols': '29',
                                                            'class': ''}))

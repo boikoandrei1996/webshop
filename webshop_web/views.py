@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from models import *
+from forms import *
 from webshop_engine.send_email import send_async as send
 
 
@@ -44,6 +45,19 @@ def __base_settings(result_dict, user_id):
     return result_dict
 
 
+def __get_or_create_cart_by_id_user(user_id):
+    try:
+        cart = CartModel.objects.get(id_user=user_id)
+    except CartModel.DoesNotExist:
+        cart = CartModel()
+        cart.id_user = user_id
+        cart.total_price = 0
+        cart.total_amount = 0
+        cart.save()
+
+    return cart
+
+
 def home(request):
     #print '---------------------'
     #print request.COOKIES
@@ -57,14 +71,15 @@ def home(request):
     #print user_id
     #print type(user_id)
 
-    user_id = request.session.get('_auth_user_id')
+    user_id = int(request.session.get('_auth_user_id'))
 
-    slide_count_max = 5
+    max_slide_count = 5
+    slide_active = 3
     max_photo_on_slide = 3
 
     slide_items = []
     products = ProductModel.objects.get_queryset().order_by('price')
-    for prod in products[:slide_count_max]:
+    for prod in products[:max_slide_count]:
         images = []
         for pair in ImageGalleryMap.objects.filter(gallery=prod.gallery)[:max_photo_on_slide]:
             images.append(pair.image.path)
@@ -74,7 +89,7 @@ def home(request):
     result_dict = dict()
     result_dict = __base_settings(result_dict, user_id)
     result_dict['slide_items'] = slide_items
-    result_dict['slide_active'] = 3
+    result_dict['slide_active'] = slide_active
     result_dict['categories'] = CategoryModel.objects.all()
     return render(request, "webshop/home.html", result_dict)
 
@@ -143,13 +158,7 @@ def add_to_cart(request, id_product):
             return redirect('/')
 
         user_id = int(request.session.get('_auth_user_id'))
-        try:
-            cart = CartModel.objects.get(id_user=user_id)
-        except CartModel.DoesNotExist:
-            cart = CartModel()
-            cart.id_user = user_id
-            cart.total_price = 0
-            cart.total_amount = 0
+        cart = __get_or_create_cart_by_id_user(user_id)
 
         cart.total_price += prod.price
         cart.total_amount += 1
@@ -210,49 +219,56 @@ def delete_from_cart(request, id_product):
 
 def view_cart(request):
     user_id = int(request.session.get('_auth_user_id'))
-
-    try:
-        cart = CartModel.objects.get(id_user=user_id)
-    except CartModel.DoesNotExist:
-        cart = CartModel()
-        cart.id_user = user_id
-        cart.total_price = 0
-        cart.total_amount = 0
-        cart.save()
+    cart = __get_or_create_cart_by_id_user(user_id)
 
     result_dict = dict()
     result_dict = __base_settings(result_dict, user_id)
     result_dict['cart_product_pairs'] = CartProductMap.objects.filter(cart=cart)
     result_dict['cart'] = cart
+    result_dict['form_client'] = ClientForm()
 
     return render(request, 'webshop/package_order.html', result_dict)
 
 
 def order(request, id_cart):
     if request.method == 'POST':
-        client = ClientModel()
-        client.name = request.POST.get('name')
-        client.city = request.POST.get('city')
-        client.address = request.POST.get('address')
-        client.mobile = request.POST.get('mobile')
-        client.comment = request.POST.get('comment')
-        client.save()
+        form_client = ClientForm(request.POST)
+        if form_client.is_valid():
+            client = ClientModel()
+            client.name = form_client.cleaned_data['name']
+            client.city = form_client.cleaned_data['city']
+            client.address = form_client.cleaned_data['address']
+            client.mobile = form_client.cleaned_data['mobile']
+            client.comment = form_client.cleaned_data['comment']
+            client.save()
 
-        new_order = OrderModel()
-        new_order.cart = CartModel.objects.get(id=int(id_cart))
-        new_order.client = client
-        new_order.status = 'processing'
-        new_order.save()
+            new_order = OrderModel()
+            new_order.cart = CartModel.objects.get(id=int(id_cart))
+            new_order.client = client
+            new_order.status = 'processing'
+            new_order.save()
 
-        text = __info_about_order(client, new_order)
+            text = __info_about_order(client, new_order)
 
-        send(sender='BoikoAndrei1996@gmail.com',
-             recipient='boikoandrei1996@mail.ru',
-             user_name='BoikoAndrei1996@gmail.com',
-             user_passwd='17131519bsuir',
-             message_title='---New order on Case.by---',
-             text=text)
+            send(sender='BoikoAndrei1996@gmail.com',
+                 recipient='boikoandrei1996@mail.ru',
+                 user_name='BoikoAndrei1996@gmail.com',
+                 user_passwd='17131519bsuir',
+                 message_title='---New order on Case.by---',
+                 text=text)
 
-        return redirect('/')
+            return redirect('/')
+        else:
+            user_id = int(request.session.get('_auth_user_id'))
+            cart = __get_or_create_cart_by_id_user(user_id)
+
+            result_dict = dict()
+            result_dict = __base_settings(result_dict, user_id)
+            result_dict['cart_product_pairs'] = CartProductMap.objects.filter(cart=cart)
+            result_dict['cart'] = cart
+            result_dict['form_client'] = form_client
+
+            return render(request, 'webshop/package_order.html', result_dict)
+
     else:
-        return redirect('/')
+        return redirect('/cart')
